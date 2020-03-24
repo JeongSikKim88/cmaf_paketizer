@@ -72,7 +72,7 @@ make install
 
 ###### libx264 ########
 cd ~/ffmpeg_sources && \
-git -C x264 pull 2> /dev/null || git clone --depth 1 https://git.videolan.org/git/x264 && \
+git -C x264 pull 2> /dev/null || git clone --depth 1 https://git.videolan.org/git/x264.git && \
 cd x264 && \
 PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" --enable-static --enable-pic && \
 PATH="$HOME/bin:$PATH" make -j$MJOBS && \
@@ -117,7 +117,7 @@ make install
 ######### libaom #########
 cd ~/ffmpeg_sources && \
 git -C aom pull 2> /dev/null || git clone --depth 1 https://aomedia.googlesource.com/aom && \
-mkdir aom_build && \
+mkdir -p aom_build && \
 cd aom_build && \
 PATH="$HOME/bin:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$HOME/ffmpeg_build" -DENABLE_SHARED=off -DENABLE_NASM=on ../aom && \
 PATH="$HOME/bin:$PATH" make -j$MJOBS && \
