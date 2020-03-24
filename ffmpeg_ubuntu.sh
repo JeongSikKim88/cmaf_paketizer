@@ -43,19 +43,11 @@ fi
 
 echo "Using $MJOBS make jobs simultaneously."
 
-######### cuda ##########
-cd ~/ffmpeg_sources && \
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_10.0.130-1_amd64.deb && \
-sudo dpkg -i cuda-repo-ubuntu1604_10.0.130-1_amd64.deb && \
-sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub && \
-sudo apt-get update && \
-sudo apt-get install -y cuda
-
 ######### nasm ##########
 cd ~/ffmpeg_sources && \
-wget https://www.nasm.us/pub/nasm/releasebuilds/2.13.03/nasm-2.13.03.tar.bz2 && \
-tar xjvf nasm-2.13.03.tar.bz2 && \
-cd nasm-2.13.03 && \
+wget https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2 && \
+tar xjvf nasm-2.14.02.tar.bz2 && \
+cd nasm-2.14.02 && \
 ./autogen.sh && \
 PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" && \
 make -j$MJOBS && \
@@ -84,6 +76,14 @@ cd ~/ffmpeg_sources && \
 if cd x265 2> /dev/null; then hg pull && hg update; else hg clone https://bitbucket.org/multicoreware/x265; fi && \
 cd x265/build/linux && \
 PATH="$HOME/bin:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$HOME/ffmpeg_build" -DENABLE_SHARED=off ../../source && \
+PATH="$HOME/bin:$PATH" make -j$MJOBS && \
+make install
+
+##### libvpx #####
+cd ~/ffmpeg_sources && \
+git -C libvpx pull 2> /dev/null || git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git && \
+cd libvpx && \
+PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/ffmpeg_build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm && \
 PATH="$HOME/bin:$PATH" make -j$MJOBS && \
 make install
 
@@ -154,14 +154,7 @@ PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./conf
   --enable-libvpx \
   --enable-libx264 \
   --enable-libx265 \
-  --enable-nonfree \
-  --enable-cuda \
-  --enable-cuvid \
-  --enable-nvenc \
-  --enable-nonfree \
-  --enable-libnpp \
-  --extra-cflags=-I/usr/local/cuda/include \
-  --extra-ldflags=-L/usr/local/cuda/lib64 && \
+  --enable-nonfree && \
 PATH="$HOME/bin:$PATH" make -j$MJOBS && \
 make install && \
 hash -r
