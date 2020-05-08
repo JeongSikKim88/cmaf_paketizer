@@ -20,7 +20,12 @@ sudo apt-get update -qq && sudo apt-get -y install \
   pkg-config \
   texinfo \
   wget \
-  zlib1g-dev
+  zlib1g-dev \
+  libssl-dev
+
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+source ~/.profile
 
 PACKAGES="$HOME/ffmpeg_sources"
 WORKSPACE="$HOME/ffmpeg_build"
@@ -131,6 +136,23 @@ PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/ffmpeg_build" --disable-examp
 PATH="$HOME/bin:$PATH" make -j$MJOBS && \
 make install
 
+
+####### librav1e #######
+cd ~/ffmpeg_sources && \
+wget https://github.com/xiph/rav1e/archive/v0.3.1.tar.gz && \
+tar xvf v0.3.1.tar.gz && cd rav1e-0.3.1 && \
+cargo build --release && \
+find target -name rav1e -exec install -m 755 {} $HOME/bin \; && \
+strip ~/bin/rav1e && \
+cargo install cargo -c && \
+cd ~/ffmpeg_sources/rav1e-0.3.1 && 
+cargo cinstall --release \
+--prefix=$HOME/ffmpeg_build \
+--libdir=$HOME/ffmpeg_build/lib \
+--includedir=$HOME/ffmpeg_build/include && \
+rm -v $HOME/ffmpeg_build/lib/librav1e.so*
+
+
 ######## Finally install ffmpeg #########
 cd ~/ffmpeg_sources && \
 git -C ffmpeg pull 2> /dev/null || git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg && \
@@ -154,6 +176,7 @@ PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./conf
   --enable-libvpx \
   --enable-libx264 \
   --enable-libx265 \
+  --enable-librav1e \
   --enable-nonfree && \
 PATH="$HOME/bin:$PATH" make -j$MJOBS && \
 make install && \
