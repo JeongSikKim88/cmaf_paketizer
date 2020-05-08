@@ -149,7 +149,8 @@ cd ~/ffmpeg_sources/rav1e-0.3.1 &&
 cargo cinstall --release \
 --prefix=$HOME/ffmpeg_build \
 --libdir=$HOME/ffmpeg_build/lib \
---includedir=$HOME/ffmpeg_build/include && \
+--includedir=$HOME/ffmpeg_build/include
+
 rm -v $HOME/ffmpeg_build/lib/librav1e.so*
 
 
